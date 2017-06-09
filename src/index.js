@@ -1,14 +1,17 @@
 import {generateCirclePoly, fractalMutatePoly, simplify} from './polygen';
 import {uniform} from './rand';
 import probmap from './probmap';
+import colorSampler from './color-sampler';
 
 require('./style.css');
 
-const width = 1000;
-const height = 1000;
+const width = 2500;
+const height = 3000;
 const canvas = Object.assign(document.createElement('canvas'), {width, height});
 document.body.appendChild(canvas);
 const ctx = canvas.getContext('2d');
+
+const sampler = colorSampler(require('./dickbutt.jpg'));
 
 const drawPoly = (ctx, poly) => {
   ctx.beginPath();
@@ -47,9 +50,28 @@ function drawBlob(ctx, radius, colorGetter, layers = 100) {
   }
 }
 
-ctx.translate(300, 300);
-for (let i = 0; i < 5; i++) {
-  const color = colormap();
-  drawBlob(ctx, 200, () => color, 30);
-  ctx.translate(0, 50);
+//ctx.translate(300, 300);
+
+function sampleSingle() {
+  const fx = uniform(0, 1);
+  const fy = uniform(0, 1);
+  const rgb = sampler(fx, fy);
+  if(rgb[0] > 240) return;
+  const color = `hsl(${10 + fy * 20}, 80%, ${uniform(30, 60)}%)`;
+  ctx.save();
+  ctx.translate(fx * width, fy * height);
+  const r = uniform(10, 20);
+  drawBlob(ctx, r, () => color, 40);
+  ctx.restore();
 }
+
+setInterval(() => {
+  for(var i = 0; i < 5; i++) sampleSingle();
+}, 5);
+
+
+//for (let i = 0; i < 5; i++) {
+//  const color = colormap();
+//  drawBlob(ctx, 200, () => color, 30);
+//  ctx.translate(0, 50);
+//}
