@@ -1,10 +1,10 @@
-import {uniform, gaussian} from './rand';
+import {uniform} from './rand';
 
-export const generateCirclePoly = (nPoints = 8) => (
+export const generateCirclePoly = (nPoints = 8, radius = 300, angle = uniform(0, Math.PI * 2)) => (
   new Array(nPoints).fill(0).map((_, i) => (
     {
-      x: Math.cos(i / nPoints * Math.PI * 2) * 300,
-      y: Math.sin(i / nPoints * Math.PI * 2) * 300,
+      x: Math.cos(i / nPoints * Math.PI * 2 + angle) * radius,
+      y: Math.sin(i / nPoints * Math.PI * 2 + angle) * radius,
     }
   ))
 );
@@ -26,15 +26,15 @@ function recursively(fn, variance, iterations, multiplier = 1) {
   };
 }
 
-export const fractalMutatePoly = (poly, variance) => {
+export const fractalMutatePoly = (poly, variance, useSeglen = true) => {
   const newPoly = [];
   for (let i = 0; i < poly.length; i++) {
     const pa = poly[i % poly.length];
     const pb = poly[(i + 1) % poly.length];
-    const segLen = Math.sqrt(getSegmentLength(pa, pb));
+    const segLen = (useSeglen ? Math.sqrt(getSegmentLength(pa, pb)) : 1);
     const mp = {
-      x: (pa.x + pb.x) * 0.5 + gaussian(0, variance * segLen),
-      y: (pa.y + pb.y) * 0.5 + gaussian(0, variance * segLen),
+      x: (pa.x + pb.x) * 0.5 + uniform(-variance, variance) * segLen,
+      y: (pa.y + pb.y) * 0.5 + uniform(-variance, variance) * segLen,
     };
     newPoly.push(pa);
     newPoly.push(mp);
